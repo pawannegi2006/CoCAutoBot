@@ -1,0 +1,75 @@
+name: Build APK from ZIP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Extract ZIP and setup project
+        run: |
+          echo "Looking for ZIP file..."
+          ls -la
+          
+          ZIP_FILE=$(find . -name "*.zip" -type f | head -1)
+          
+          if [ -z "$ZIP_FILE" ]; then
+            echo "No ZIP file found. Checking if project files exist directly..."
+            if [ -f "build.gradle" ]; then
+              echo "Project files already extracted. Skipping ZIP extraction."
+              exit 0
+            else
+              echo "ERROR: No ZIP file and no project files found!"
+              exit 1
+            fi
+          fi
+          
+          echo "Found ZIP: $ZIP_FILE"
+          echo "Extracting..."
+          unzip "$ZIP_FILE" -d extracted
+          
+          if [ -d "extracted/CoCAutoBot" ]; then
+            echo "Moving files from extracted/CoCAutoBot to root..."
+            mv extracted/CoCAutoBot/* .
+            mv extracted/CoCAutoBot/.* . 2>/dev/null || true
+          else
+            echo "Moving all extracted files to root..."
+            mv extracted/* .
+            mv extracted/.* . 2>/dev/null || true
+          fi
+          
+          rm -rf extracted "$ZIP_FILE"
+          echo "Final project structure:"
+          ls -la
+          
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+        
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
