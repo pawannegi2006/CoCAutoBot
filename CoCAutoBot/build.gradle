@@ -1,9 +1,0 @@
-// Top-level build file for CoCAutoBot project
-// DISCLAIMER: This project is strictly for educational and research purposes only.
-// Using automation tools violates Clash of Clans Terms of Service and may result in permanent account bans.
-// The user assumes all risks associated with using this software.
-
-plugins {
-    id 'com.android.application' version '8.2.0' apply false
-    id 'org.jetbrains.kotlin.android' version '1.9.20' apply false
-}
