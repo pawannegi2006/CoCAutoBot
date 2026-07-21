@@ -41,6 +41,19 @@ jobs:
           echo "App folder contents:"
           ls -la app/ 2>/dev/null || echo "No app folder found!"
           
+      - name: Download Gradle Wrapper JAR
+        run: |
+          echo "Checking for gradle-wrapper.jar..."
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "gradle-wrapper.jar missing. Downloading..."
+            mkdir -p gradle/wrapper
+            curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradle/wrapper/gradle-wrapper.jar
+            echo "Downloaded gradle-wrapper.jar"
+          else
+            echo "gradle-wrapper.jar already exists."
+          fi
+          ls -la gradle/wrapper/
+          
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
