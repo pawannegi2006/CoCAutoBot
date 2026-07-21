@@ -1,4 +1,0 @@
-<resources>
-    <string name="app_name">CoCAutoBot</string>
-    <string name="accessibility_service_description">CoCAutoBot Accessibility Service - Required for simulating touch inputs during bot automation. This service detects screen content and performs automated clicks and gestures.</string>
-</resources>
